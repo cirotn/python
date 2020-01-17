@@ -1,0 +1,149 @@
+* Notes from Fluent Python
+
+** Notes
+
+*** Dunder methods
+
+__get_item__ is called by the [] operator.
+__len__ is called by len.
+__contains__ is called by in operator. If method doesn't exist, in uses a sequential scan.
+__iter__ is called when iteration is needed, such as a for loop, which invokes (iter(x). If there is not __iter__, it uses __get_item__ (older behavior).
+__repr__ is called by repr, or by str() if __str__ is not there. It should be unabiguous and match the source code to recreate the object, if possible.
+__str__ is called by str(). It should return a string suitable for display.
+__bool__ is called by bool(). If not implemented, bool() calls __len__, and if also not, returns True.
+__next__ is called to advance iterators. Iterators have a __next__ method (throws at the end) and a __iter__ method (iterators are also iterable).
+
+For built-in types, built-in implementations may not call dunder methods. CPython's len() implementation doesn't call built-in types' __len__ for instance. The methods allow user-defined classes to fit well into the language but are not made to allow extension of built-in types.
+
+*** Standard library sequences
+
+Containers: list, tuple, collections.dequeu
+Flat sequences: array.array, str, bytes, bytearray, memoryview
+
+Of these, tuple, str, and bytes are immutable.
+
+*** Use comprehensions
+
+listcomp: [ord(s) for s in symbols if ord(s) > 127]
+
+genexp: tuple(ord(symbol) for symbol in symbols)
+        array.array('I', (ord(symbol) for symbol in symbols)
+
+        (first argument of array constructor is the storage type)
+
+dictcomps: {country: code for code in DIAL_CODES}
+
+           (where DIAL_CODES is a list of tuples)
+
+setcomps: {s**2 for s in range(5)}
+
+Listcomps and gencomps can be used in situations where you would use map or filter in other languages.
+
+*** Use * to unpack rest of tuple items as a list
+
+a,b, *rest = range(5)
+# rest is a list of len 3
+
+*head, b, c, d = range(5)
+# head is a list of len 2
+
+t = (20, 8)
+divmod(*t)
+# tuple expands into two paremeters of divmod
+
+*** Tuple unpacking can be nested
+
+    # vals is list of tuples, where each has three elements and second is a tuple
+for a, b, (c, d) in vals:
+    pass
+
+*** You can assign to a slice
+
+# right side of assignment must be an iterable
+l = list(range(10))
+l[2:4] = [20, 30]
+
+Use * to take a variable number of params
+Use named tuples for structs, or a class
+
+*** List.sort does an in place sort, sorted function returns a copy
+
+*** Use bisect and insort to insert into a sorted list
+
+Bisect searches for a location and returns an index. The index is where you would insert a value. Insort also searches for a location, and does the insertion as well.
+
+bisect.insort(my_list, new_item)
+
+*** Use arrays for lists of numbers
+
+Arrays are more efficient than lists, but limited to a single type.
+
+a = array('d', (random() for i in range(10**3)))
+
+Use memoryview to pass array slices without copying.
+
+*** Handling missing dict keys
+
+To get a value from a dict if it exists, if not, use a default:
+d.get(k, default)
+# returns default if key doesn't exist, rather than throwing KeyError
+
+You can also get a value if it exists, and have a default value inserted and returned if not:
+val = d.setdefault(key,default)
+# little odd that this is called set, it's actually getting a value (and sometimes also setting)
+
+Could also:
+- Use a defaultdict, which creates an entry with default value whenever a missing key is searched
+- Subclass UserDict and overriding __missing__ (UserDict is similar to dict but not built-in, so all dunder methods can be overriden)
+
+*** Use Counter to counter hashable objects
+
+ct = collections.Counter('abracadabra')
+ct.update('aaaazzz')
+ct.most_common(2) # returns list of two most common values
+
+*** bind functionality is in functools.partial
+
+triple = functools.partial(mul, 3)
+# triple is mul with first parameter bound to 3
+
+*** Weak references
+
+Python has weak references implemented in weakref. Some types are not supported.
+
+*** Use dis module to disassemble a function
+
+from dis import dis
+dis(my_function)
+
+** Beware
+
+*** Using * or + with containers of mutable items can be misleading
+
+matrix = [[] * 3] * 3
+# inner lists are aliased, modifying one rwo changes all three
+
+*** The behavior of += or *= changes depending on mutability
+
+Using += with a mutable sequence calls __iadd__ if implemented and happens in place, otherwise calls __add__.
+
+*** Dict ordering
+
+Order in dicts is not stable. Use OrderedDict if order matters.
+
+*** Variable scope is determined through heuristic
+
+Since you don't have to declare variables in Python, it uses a heuristic to determine whether a variable is local. If the enclosing scope contains an assignment, it is considered local.
+
+Use the nonlocal or global keyword if not desired.
+
+*** Copies are shallow by default
+
+Nested sequences only create copies of the outer one. Use copy.deepcopy.
+
+*** Mutable types as default parameters are bad
+
+def function(val, keys=[]):
+    pass
+
+Every invocation of the function gets the same list object, not a new empty list.
