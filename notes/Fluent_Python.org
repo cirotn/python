@@ -5,12 +5,19 @@
 *** Dunder methods
 
 __get_item__ is called by the [] operator.
+
 __len__ is called by len.
+
 __contains__ is called by in operator. If method doesn't exist, in uses a sequential scan.
+
 __iter__ is called when iteration is needed, such as a for loop, which invokes (iter(x). If there is not __iter__, it uses __get_item__ (older behavior).
+
 __repr__ is called by repr, or by str() if __str__ is not there. It should be unabiguous and match the source code to recreate the object, if possible.
+
 __str__ is called by str(). It should return a string suitable for display.
+
 __bool__ is called by bool(). If not implemented, bool() calls __len__, and if also not, returns True.
+
 __next__ is called to advance iterators. Iterators have a __next__ method (throws at the end) and a __iter__ method (iterators are also iterable).
 
 For built-in types, built-in implementations may not call dunder methods. CPython's len() implementation doesn't call built-in types' __len__ for instance. The methods allow user-defined classes to fit well into the language but are not made to allow extension of built-in types.
