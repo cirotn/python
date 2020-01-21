@@ -1,0 +1,16 @@
+* Basic Python Language Notes
+
+** Enums
+
+Added to Python 3.4:
+
+from enum import Enum
+Animal = Enum('Animal', 'ant bee cat dog')
+
+or, equivalently,
+
+class Animal(Enum):
+    ant = 1
+    bee = 2
+    cat = 3
+    dog = 4
