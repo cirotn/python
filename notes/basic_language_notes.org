@@ -1,5 +1,85 @@
 * Basic Python Language Notes
 
+** Function overloading
+
+Python doesn't support method overloading. Python methods don't name a type, so adding that to the language would be awkward. You need to instead use other features like default parameters and functions with variable number of arguments to do the same.
+
+** New-style class
+
+In Python 3, all classes are new-style. New-style classes inherit from object.
+https://docs.python.org/2/reference/datamodel.html#newstyle
+
+** Method resolution order (mro)
+
+The list of the ancestors of a class C, including the class itself, ordered from the nearest ancestor to the furthest, is called the class precedence list or the linearization of C.
+
+The Method Resolution Order (MRO) is the set of rules that construct the linearization. It is called the C3 algorithm.
+
+A linearization should be monotonic: if C1 precedes C2 in the linearization of C, then C1 precedes C2 in the linearization of any subclass of C. It should also follow local precendence ordering - a class C(C1, C2) should have C1 before C2 in its mro.
+
+You can create hierarchies that can't be linearized, which causes an exception:
+class A(X, Y): pass
+class B(Y, X): pass
+class C(A, B): pass # throws in Python 2.3 and above
+
+You can think of the linearization as depth-first, left-to-right, not searching twice in the same class. When a class appears multiple times in the hierarchy, it will appear later to avoid breaking monotonicity.
+
+The procedure is as follows. Given a hierarchy like this:
+class C(X, Y): pass
+
+C goes at the beginning of the linearization. Then X goes next, because it doesn't show up anywhere else. Then, Object is skipped until later, because it shows up elsewhere (under Y). Instead we go to the next class on the list and take Y. Finally, we take object.
+
+L[C] = C + merge(XO,YO) # XO and YO are the linearizations of classes X and Y
+     = C + X + merge(O,YO)
+     = C + X + Y + merge(O,O) # If the class in question is in the head of multiple lists, take it
+     = C X Y O
+
+Another example:
+
+L[A] = A + merge(BDEO,CDFO,BC)
+     = A + B + merge(DEO,CDFO,C) # Can't take D here, shows up in CDFO
+     = A + B + C + merge(DEO,DFO) # D is in the head of another list, take it from both
+     = A + B + C + D + merge(EO,FO)
+     = A + B + C + D + E + merge(O,FO) # Can't take O here
+     = A + B + C + D + E + F + merge(O,O)
+     = A B C D E F O
+
+Impossible example:
+
+L[C] = C + merge(AXYO, BYXO, AB)
+     = C + A + merge(XYO, BYXO, B)
+     = C + A + B + merge(XYO, YXO) # Can't take either X or Y
+
+** Multiple inheritance
+
+Python supports multiple inheritance:
+
+class DerivedClassName(Base1, Base2, Base3): pass
+
+Since all classes inherit from object, multiple inheritance always creates a diamond structure. See method resolution order. In a diamond hierarchy, there is only one instance of the base class, and the mro definition ensures it only appears once in the mro.
+
+In Python, the mro of an object can be affected by its subclasses. For example:
+
+class LoggingDict(dict):
+    def __setitem__(self, key, value):
+        logging.info('Setting %r to %r' % (key, value))
+        super().__setitem__(key, value)
+
+class LoggingOrderedDict(LoggingDict, colletions.orderedDict) : pass
+
+Now we have an mro of LoggingOrderedDict -> LoggingDict -> collections.OrderedDict -> dict -> object. Any calls in LoggingDict that went to its superclass are now going to collections.OrderedDict.
+
+** super
+
+Allows you to name the next class in the mro without specifying it specifically, just like other languages:
+
+class LoggingDict(dict):
+    def __setitem__(self, key, value):
+        logging.info('Setting %r to %r' % (key, value))
+        super().__setitem__(key, value)
+
+super() actually takes two parameters. The call above is equivalent to super(LoggingDict, self). The second parameter specifies the mro that is searched, and the first specifies the starting class in the mro. The first parameter must be present in the mro. Calling super with no arguments can only be done within a method, and the Python bytecode compiler has specific logic to support this.
+
 ** Enums
 
 Added to Python 3.4:
