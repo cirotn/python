@@ -1,8 +1,61 @@
 * Basic Python Language Notes
 
+** Calling Functions
+
+Python functions always return a value. By default, they return None.
+
+Function default values are evaluted when the function is defined, and only then (thus using mutable values is problematic).
+
+Functions can be called with keyword arguments:
+
+def foo(a, b) : pass # can be called using foo(b = 0, a = 1)
+
+Keyword arguments in a function call need to be after positional arguments, obviously.
+
+You can unpack a list or tuple into positional arguments within a function call:
+t = (1, 2)
+foo(*t) # where foo takes two arguments
+
+You can also unpack a dict into keyword arguments:
+d = {'a' = 1, 'b' = 2}
+foo(**d)
+
+** Types of function parameters
+
+A function can have a parameter of the form *param:
+
+def foo(a, *b)
+
+Here b is a single tuple which contains all the positional arguments after the first. If the call is foo(1, 2, 3, 4), then b i s tuple (2, 3, 4). Any parameters after a parameter of this type will be keyword only parameters.
+
+A function can also have a parameter of the form **kwargs:
+
+def foo(a, **kwargs)
+
+Here kwargs is a dict containing all keyword arguments except for the one that corresponds to a. They will be in order.
+
+You can use all of them together:
+
+def foo(a, *b, **kwargs)
+
+They must be always in this order.
+
+A parameter list can also include the / and * tokens by themselves:
+
+def foo(a, /, b, *, c)
+
+Here a is is positional only, b is either positional or keyword, c is keyword only.
+
 ** Function overloading
 
-Python doesn't support method overloading. Python methods don't name a type, so adding that to the language would be awkward. You need to instead use other features like default parameters and functions with variable number of arguments to do the same.
+Python doesn't support function overloading. Python methods don't name a type, so adding that to the language would be awkward. You need to instead use other features like default parameters and functions with variable number of arguments to do the same.
+
+** Lambdas
+
+Lambdas are restricted to single expressions in Python.
+
+def make_incrementor(n):
+    return lambda x: x + n
 
 ** New-style class
 
