@@ -57,6 +57,16 @@ Lambdas are restricted to single expressions in Python.
 def make_incrementor(n):
     return lambda x: x + n
 
+** Function annotations
+
+Annotations are just stored, have no effect on the function. Tools may use them.
+
+def foo(a : str) -> str :
+   print(a)
+   return a + 'blah'
+
+denotes a function that takes a string and return a string.
+
 ** New-style class
 
 In Python 3, all classes are new-style. New-style classes inherit from object.
