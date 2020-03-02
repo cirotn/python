@@ -1,5 +1,17 @@
 * Basic Python Language Notes
 
+** eval
+
+Executes a string as Python code.
+
+** Large integers
+
+Python automatically handles large integers.
+
+** Garbage collection
+
+Python garbage collection can detect cycles and deal with them properly.
+
 ** Calling Functions
 
 Python functions always return a value. By default, they return None.
@@ -66,6 +78,54 @@ def foo(a : str) -> str :
    return a + 'blah'
 
 denotes a function that takes a string and return a string.
+
+** del
+
+del removes a name from the namespace. It can also be used to remove items from a list:
+
+del a[2:4] # Removes items and shortens the list
+
+del can also remove a key value pair from a dict.
+
+** Tuples
+
+Tuples are specified using parenthesis - which is a problem for tuples with a single element:
+a = () # Empty tuple
+b = (1,) # Single element tuple, needs a comma
+
+In assignments, tuple packing and unpacking have a simple syntax:
+a, b = t # unpacking
+t = a, b # packing
+
+** Sets
+
+Sets are specified with curly braces like dicts. Empty curly braces create an empty dict, so set() must be used:
+
+d = {} # Empty dict
+s = set() #  Empty set
+
+Boolean operators like |, &, and ^ work on sets. The minus operator also does.
+
+** Dicts
+
+Construct a dict from list of key value pairs:
+d = dict([('a', 0), ('b', 1), ('c', 2)])
+
+Or by passing a dict using keyword arguments to the constructor, if keys are strings:
+d = dict(a = 0, b = 1, c = 2) # More concise
+
+** Iterating through sequences
+
+Use d.items() to iterate over a dict:
+for k, v in d.items(): pass
+
+Use enumerate to iterate over a sequence when indices are needed:
+for i, v in enumerate(l): pass
+
+Use zip to iterate over parallel sequences:
+for a, b in zip(l1, l2): pass
+
+Use sorted, reversed to modify iteration order.
 
 ** New-style class
 
@@ -157,3 +217,39 @@ class Animal(Enum):
     bee = 2
     cat = 3
     dog = 4
+** __name__
+
+Name returns the name of the module (python file), unless it is __main__.
+
+** import
+
+You can import a module or package.
+
+# import entire a module, accessed as a.something
+import a
+
+# import a single symbol, accessed simply as b
+from a import b
+
+# import all symbols, accessed with no qualifications
+form a import *
+
+# import and access as b.something
+import a as b
+
+# import module a in directory dir (dir must have a __init__.py if 3.2 or less
+import dir.a
+
+Imports only happen once, and later operations use cached values for the objects. Imports behave like assignments.
+
+** __init__.py
+
+Until 3.3, an import statement would only consider directories with __init__.py. They are often empty for this reason.
+
+Code for __init__.py runs when importing something in that directory structure, so only useful to initialize packages.
+
+__init__.py can change __all__ to determine behavior of import *.
+
+** reload
+
+You can use reload to modify a program without exiting the process.
