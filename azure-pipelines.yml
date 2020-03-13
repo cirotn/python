@@ -10,7 +10,7 @@ pool:
   name: de-dre-lab
 
 steps:
-- script: echo Hello, world!
+- script: env
   displayName: 'Run a one-line script'
 
 - script: |
