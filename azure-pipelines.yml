@@ -8,6 +8,8 @@ trigger:
 
 pool:
   name: de-dre-lab
+  demands:
+  - openembedded
 
 steps:
 - script: env
